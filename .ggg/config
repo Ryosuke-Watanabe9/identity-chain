@@ -1,0 +1,11 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	url = https://github.com/Ryosuke-Watanabe9/identity-chain
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "release-1.1"]
+	remote = origin
+	merge = refs/heads/release-1.1

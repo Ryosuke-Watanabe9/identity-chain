@@ -1,0 +1,12 @@
+docker restart cli
+docker restart peer0.org1.identity.com
+docker restart peer0.org2.identity.com
+docker restart peer1.org1.identity.com
+docker restart peer1.org2.identity.com
+docker restart orderer.identity.com
+docker restart couchdb0
+docker restart couchdb1
+docker restart couchdb2
+docker restart couchdb3
+docker restart ca_peerOrg1
+docker restart ca_peerOrg2
