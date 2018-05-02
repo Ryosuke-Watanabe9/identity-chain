@@ -15,6 +15,8 @@ echo config-done
 
 # dockerの起動
 CHANNEL_NAME=$CHANNEL_NAME TIMEOUT=10000 docker-compose -f docker-compose-cli.yaml -f docker-compose-couch.yaml -f docker-compose-ca.yaml up -d
-#-f docker-compose-ca.yaml up -d
+
+# this is shell script to set channel configlation
+docker cp setupMychannel.sh cli:/opt/gopath/src/github.com/hyperledger/fabric/peer
 
 echo all-done
