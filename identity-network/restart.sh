@@ -8,5 +8,4 @@ docker restart couchdb0
 docker restart couchdb1
 docker restart couchdb2
 docker restart couchdb3
-docker restart ca_peerOrg1
-docker restart ca_peerOrg2
+docker restart ca.identity.com
