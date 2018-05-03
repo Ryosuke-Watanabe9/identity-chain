@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"strconv"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
@@ -14,26 +13,27 @@ import (
 type SmartContract struct {
 }
 
-// MaxNumber structure
+/*
 type MaxNumber struct {
 	MaxUserID string `json:"maxUserID"`
 }
+*/
 
 // User structure
 type User struct {
-	UserID   string `json:"userID"`
+	//UserID   string `json:"userID"`
 	UserInfo string `json:"userInfo"`
 }
 
 //Init method is called as a result of deployment "operateUserInfo"
 func (s *SmartContract) Init(APIstub shim.ChaincodeStubInterface) sc.Response {
-
-	var maxNumber = MaxNumber{
-		MaxUserID: "0",
-	}
-	maxNumberAsBytes, _ := json.Marshal(maxNumber)
-	APIstub.PutState("maxUserID", maxNumberAsBytes)
-
+	/*
+		var maxNumber = MaxNumber{
+			MaxUserID: "0",
+		}
+		maxNumberAsBytes, _ := json.Marshal(maxNumber)
+		APIstub.PutState("maxUserID", maxNumberAsBytes)
+	*/
 	return shim.Success(nil)
 }
 
@@ -58,32 +58,32 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 
 func (s *SmartContract) createUser(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 1 {
-		return shim.Error("Incorrect number of arguments. Expecting 1")
+	if len(args) != 2 {
+		return shim.Error("Incorrect number of arguments. Expecting 2")
 	}
+	/*
+		//get maxNumber of application
+		maxNumberAsBytes, _ := APIstub.GetState("maxUserID")
 
-	//get maxNumber of application
-	maxNumberAsBytes, _ := APIstub.GetState("maxUserID")
+		maxNumber := MaxNumber{}
+		json.Unmarshal(maxNumberAsBytes, &maxNumber)
 
-	maxNumber := MaxNumber{}
-	json.Unmarshal(maxNumberAsBytes, &maxNumber)
+		var tmpNumber int
+		tmpNumber, _ = strconv.Atoi(maxNumber.MaxUserID)
+		tmpNumber = tmpNumber + 1
 
-	var tmpNumber int
-	tmpNumber, _ = strconv.Atoi(maxNumber.MaxUserID)
-	tmpNumber = tmpNumber + 1
-
-	maxNumber.MaxUserID = strconv.Itoa(tmpNumber)
-
+		maxNumber.MaxUserID = strconv.Itoa(tmpNumber)
+	*/
 	var user = User{
-		UserID:   maxNumber.MaxUserID,
-		UserInfo: args[0],
+		//	UserID:   args[0],
+		UserInfo: args[1],
 	}
 
-	maxNumberAsBytes, _ = json.Marshal(maxNumber)
+	//maxNumberAsBytes, _ = json.Marshal(maxNumber)
 	userAsBytes, _ := json.Marshal(user)
 
-	APIstub.PutState("maxUserID", maxNumberAsBytes)
-	APIstub.PutState(maxNumber.MaxUserID, userAsBytes)
+	//APIstub.PutState("maxUserID", maxNumberAsBytes)
+	APIstub.PutState(args[0], userAsBytes)
 
 	return shim.Success(nil)
 }
@@ -127,11 +127,11 @@ func (s *SmartContract) queryExchangeApplication(APIstub shim.ChaincodeStubInter
 }
 
 func (s *SmartContract) queryAllUserInfo(APIstub shim.ChaincodeStubInterface) sc.Response {
-
-	startKey := "0"
-	endKey := "999"
-
-	resultsIterator, err := APIstub.GetStateByRange(startKey, endKey)
+	/*
+		startKey := "0"
+		endKey := "999"
+	*/
+	resultsIterator, err := APIstub.GetStateByRange("", "")
 	if err != nil {
 		return shim.Error(err.Error())
 	}
