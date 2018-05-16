@@ -93,15 +93,16 @@ func (s *SmartContract) changeUserInfo(APIstub shim.ChaincodeStubInterface, args
 	if len(args) != 2 {
 		return shim.Error("Incorrect number of arguments. Expecting 2")
 	}
+	/*
+		changeUserInfoAsBytes, _ := APIstub.GetState(args[0])
+		user := User{}
 
-	changeUserInfoAsBytes, _ := APIstub.GetState(args[0])
-	user := User{}
+		json.Unmarshal(changeUserInfoAsBytes, &user)
+		user.UserInfo = args[1]
 
-	json.Unmarshal(changeUserInfoAsBytes, &user)
-	user.UserInfo = args[1]
-
-	changeUserInfoAsBytes, _ = json.Marshal(user)
-	APIstub.PutState(args[0], changeUserInfoAsBytes)
+		changeUserInfoAsBytes, _ = json.Marshal(user)
+	*/
+	APIstub.PutState(args[0], args[1])
 
 	return shim.Success(nil)
 }
