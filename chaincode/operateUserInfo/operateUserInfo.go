@@ -102,7 +102,8 @@ func (s *SmartContract) changeUserInfo(APIstub shim.ChaincodeStubInterface, args
 
 		changeUserInfoAsBytes, _ = json.Marshal(user)
 	*/
-	APIstub.PutState(args[0], args[1])
+	changeUserInfoAsBytes, _ = args[1]
+	APIstub.PutState(args[0], changeUserInfoAsBytes)
 
 	return shim.Success(nil)
 }
