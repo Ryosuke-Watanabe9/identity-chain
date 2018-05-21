@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
@@ -23,6 +25,7 @@ type MaxNumber struct {
 type User struct {
 	//UserID   string `json:"userID"`
 	UserInfo string `json:"userInfo"`
+	Point    int    `json:"point"`
 }
 
 //Init method is called as a result of deployment "operateUserInfo"
@@ -51,6 +54,8 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.queryAllUserInfo(APIstub)
 	} else if function == "changeUserInfo" {
 		return s.changeUserInfo(APIstub, args)
+	} else if function == "changeUserPoint" {
+		return s.changeUserPoint(APIstub, args)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
@@ -77,6 +82,7 @@ func (s *SmartContract) createUser(APIstub shim.ChaincodeStubInterface, args []s
 	var user = User{
 		//	UserID:   args[0],
 		UserInfo: args[1],
+		Point:    0,
 	}
 
 	//maxNumberAsBytes, _ = json.Marshal(maxNumber)
@@ -93,16 +99,41 @@ func (s *SmartContract) changeUserInfo(APIstub shim.ChaincodeStubInterface, args
 	if len(args) != 2 {
 		return shim.Error("Incorrect number of arguments. Expecting 2")
 	}
-	/*
-		changeUserInfoAsBytes, _ := APIstub.GetState(args[0])
-		user := User{}
 
-		json.Unmarshal(changeUserInfoAsBytes, &user)
-		user.UserInfo = args[1]
+	str := args[1]
+	//resStr := strings.Replace(str, "\"", "", 1)
+	//resStr := strings.Replace(str, "}\"", "}", 1)
+	//resStr := strings.Replace(str, "\\", "", -1)
 
-		changeUserInfoAsBytes, _ = json.Marshal(user)
-	*/
-	changeUserInfoAsBytes, _ = args[1]
+	resStr := strings.Replace(str, "\\", "", -1)
+
+	changeUserInfoAsBytes, _ := APIstub.GetState(args[0])
+	user := User{}
+
+	json.Unmarshal(changeUserInfoAsBytes, &user)
+	user.UserInfo = resStr
+	changeUserInfoAsBytes, _ = json.Marshal(user)
+
+	APIstub.PutState(args[0], changeUserInfoAsBytes)
+
+	return shim.Success(nil)
+}
+
+func (s *SmartContract) changeUserPoint(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 2 {
+		return shim.Error("Incorrect number of arguments. Expecting 2")
+	}
+	var pointVal int
+	changeUserInfoAsBytes, _ := APIstub.GetState(args[0])
+	user := User{}
+
+	pointVal, _ = strconv.Atoi(args[1])
+
+	json.Unmarshal(changeUserInfoAsBytes, &user)
+	user.Point = user.Point + pointVal
+	changeUserInfoAsBytes, _ = json.Marshal(user)
+
 	APIstub.PutState(args[0], changeUserInfoAsBytes)
 
 	return shim.Success(nil)
@@ -116,16 +147,6 @@ func (s *SmartContract) queryUserInfo(APIstub shim.ChaincodeStubInterface, args 
 
 	userAsBytes, _ := APIstub.GetState(args[0])
 	return shim.Success(userAsBytes)
-}
-
-func (s *SmartContract) queryExchangeApplication(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-
-	if len(args) != 1 {
-		return shim.Error("Incorrect number of arguments. Expecting 1")
-	}
-
-	exchangeApplicationAsBytes, _ := APIstub.GetState(args[0])
-	return shim.Success(exchangeApplicationAsBytes)
 }
 
 func (s *SmartContract) queryAllUserInfo(APIstub shim.ChaincodeStubInterface) sc.Response {
