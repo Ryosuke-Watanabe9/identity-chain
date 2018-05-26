@@ -66,32 +66,22 @@ func (s *SmartContract) createUser(APIstub shim.ChaincodeStubInterface, args []s
 	if len(args) != 2 {
 		return shim.Error("Incorrect number of arguments. Expecting 2")
 	}
-	/*
-		//get maxNumber of application
-		maxNumberAsBytes, _ := APIstub.GetState("maxUserID")
+	check, _ := APIstub.GetState(args[0])
+	if check == nil {
+		var user = User{
+			//	UserID:   args[0],
+			UserInfo: args[1],
+			Point:    0,
+		}
 
-		maxNumber := MaxNumber{}
-		json.Unmarshal(maxNumberAsBytes, &maxNumber)
+		//maxNumberAsBytes, _ = json.Marshal(maxNumber)
+		userAsBytes, _ := json.Marshal(user)
 
-		var tmpNumber int
-		tmpNumber, _ = strconv.Atoi(maxNumber.MaxUserID)
-		tmpNumber = tmpNumber + 1
-
-		maxNumber.MaxUserID = strconv.Itoa(tmpNumber)
-	*/
-	var user = User{
-		//	UserID:   args[0],
-		UserInfo: args[1],
-		Point:    0,
+		//APIstub.PutState("maxUserID", maxNumberAsBytes)
+		APIstub.PutState(args[0], userAsBytes)
+		return shim.Success(nil)
 	}
-
-	//maxNumberAsBytes, _ = json.Marshal(maxNumber)
-	userAsBytes, _ := json.Marshal(user)
-
-	//APIstub.PutState("maxUserID", maxNumberAsBytes)
-	APIstub.PutState(args[0], userAsBytes)
-
-	return shim.Success(nil)
+	return shim.Error(args[0] + " is alredyExist")
 }
 
 func (s *SmartContract) changeUserInfo(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
